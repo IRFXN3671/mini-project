@@ -1,0 +1,19 @@
+# LaTeX build artifacts
+*.aux
+*.log
+*.fdb_latexmk
+*.fls
+*.synctex.gz
+*.toc
+*.lof
+*.lot
+*.out
+*.bbl
+*.blg
+*.bcf
+*.run.xml
+*.dvi
+*.ps
+
+# Keep the compiled PDF if desired (remove next line to exclude it too)
+# *.pdf

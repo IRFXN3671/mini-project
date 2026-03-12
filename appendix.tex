@@ -1,0 +1,32 @@
+\appendix
+\chapter{Appendix}
+\label{ch:appendix}
+
+\section{Source Code Repository}
+
+The complete source code for the BondHealth hospital management system is available in the project repository. The repository includes all route files, EJS templates, database migration scripts, and configuration files described in this report.
+
+\section{Database Schema Scripts}
+
+The PostgreSQL schema is initialised using a single migration script located at \texttt{db/schema.sql} in the project root. The script creates all tables in dependency order, defines UUID primary keys using \texttt{gen\_random\_uuid()}, and sets up the required indexes on foreign-key columns.
+
+\section{Environment Configuration}
+
+The application requires the following environment variables to be defined in a \texttt{.env} file at the project root:
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{ll}
+\hline
+\textbf{Variable} & \textbf{Purpose} \\
+\hline
+\texttt{DATABASE\_URL} & Neon PostgreSQL connection string \\
+\texttt{JWT\_SECRET} & Secret key for signing JWT tokens \\
+\texttt{PAYMENT\_SECRET\_KEY} & Payment gateway API secret \\
+\texttt{PAYMENT\_WEBHOOK\_SECRET} & Webhook signature verification key \\
+\texttt{PORT} & HTTP server port (default: 3000) \\
+\hline
+\end{tabular}
+\caption{Required Environment Variables}
+\label{tab:env-vars}
+\end{table}
