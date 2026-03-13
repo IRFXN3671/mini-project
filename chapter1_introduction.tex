@@ -1,54 +1,63 @@
 \chapter{Introduction}
 \label{ch:introduction}
 
-The healthcare industry today faces significant challenges in managing and accessing patient medical information. In the current system, patient data is often scattered across multiple hospitals and healthcare providers, creating fragmented medical histories that are difficult to access when needed. This fragmentation leads to several critical issues: patients become dependent on physical reports, undergo repeated diagnostic tests, face limited options for remote consultations, and encounter difficulties in obtaining certain medications, especially rare ones. Additionally, hospitals operate without a common digital platform to efficiently manage patient data and streamline interactions between healthcare providers and patients.
+\setlength{\parskip}{0.7\baselineskip}
 
-\noindent
-The digital transformation of healthcare has become increasingly important in recent years, with the COVID-19 pandemic highlighting the urgent need for remote healthcare solutions. Patients, particularly the elderly and those with mobility issues, require accessible healthcare services that do not always necessitate physical hospital visits. Furthermore, the need for a centralized, secure system to store and access medical records has become paramount in ensuring continuity of care and improving healthcare outcomes.
+\section{Introduction}
 
-\section{Problem Statement}
-The existing healthcare ecosystem suffers from the following key problems:
+In today's increasingly digital world, the internet has become an indispensable resource for communication, commerce, and information. However, this widespread connectivity has also given rise to a growing threat landscape of scam websites, phishing pages, and fraudulent online platforms that deceive and exploit unsuspecting users. Traditional approaches to identifying such threats — such as manually checking URLs or relying on browser warnings — are often insufficient, inconsistent, and inaccessible to non-technical users.
+
+To address these limitations, we propose \textbf{ProblySUS}, a full-stack, multi-signal scam and phishing detection system that analyzes website URLs and produces a comprehensive, explainable risk assessment. The system integrates multiple techniques including domain intelligence, DNS analysis, threat feed lookups, content inspection, headless browser simulation, privacy auditing, and tracker identification to classify websites as \textbf{Safe, Caution, Suspicious, or Fraudulent} through a composite risk score ranging from 0 to 100.
+
+By combining these signals into a single, accessible platform — available both as a web application and a browser extension — ProblySUS serves as an intelligent, real-time security companion for everyday internet users.
+
+\subsection{Methodology}
+
+The development of ProblySUS followed a structured and iterative methodology, beginning with a thorough requirement analysis. To understand the nature of the problem, we studied common phishing and scam patterns, reviewed existing detection tools, and examined open threat intelligence resources. This revealed that no single signal is sufficient for reliable scam detection — effective identification requires the combination of multiple independent indicators across URL structure, domain metadata, network behavior, and page content.
+
+Based on these insights, we proceeded to technology stack selection. The backend was developed using the \textbf{Python / Flask} framework, chosen for its simplicity, flexibility, and rich ecosystem of analysis libraries. For domain analysis, we integrated \texttt{python-whois} and \texttt{dnspython}; for content inspection, \texttt{beautifulsoup4} and \texttt{textstat}; and for real browser simulation, \textbf{Playwright with headless Chromium}, enabling the interception of JavaScript-driven redirects and runtime network requests that static HTTP analysis cannot detect.
+
+The frontend was built using \textbf{React 19 with Vite 7} and styled with \textbf{Tailwind CSS v4}, with \textbf{Framer Motion} for animations and \textbf{Axios} for API communication. Additionally, a \textbf{Chrome browser extension (Manifest V3)} was developed to bring one-click scanning directly into the user's browsing context.
+
+In the system architecture design phase, we adopted a \textbf{modular pipeline approach}, wherein each analysis concern — URL validation, domain age, DNS records, URL patterns, content trust, blacklist lookup, browser behavior, network profiling, privacy grading, and tracker identification — is handled by a dedicated independent module. All module outputs are aggregated and passed to a central risk scoring engine (\texttt{scorer.py}) that applies a confidence-weighted penalty system with compound signal amplification and hard overrides for critical threats.
+
+The architecture also incorporates a \textbf{ThreadPoolExecutor-based parallel execution model} that significantly reduces analysis time by running independent checks concurrently, and an \textbf{in-memory result cache with a 30-minute TTL} to avoid redundant scans.
+
+The development and integration process was iterative. The backend API, frontend panels, and browser extension were developed and tested in parallel, with RESTful JSON serving as the integration contract. Once development was complete, we entered the testing and evaluation phase, which included unit testing of individual modules, integration testing of the full analysis pipeline, and performance testing to validate responsiveness under different network conditions.
+
+A \textbf{Fast Mode (\texttt{?fast=true})} was also introduced to allow analysis in \textbf{3–5 seconds} by skipping the Playwright browser simulation, compared to the full \textbf{8–12 second deep scan}.
+
+\subsection{Features}
+
+ProblySUS is a multi-layered, cross-platform URL security analysis system designed to make scam detection accessible, transparent, and reliable for all users. The system performs over ten independent checks on any submitted URL and presents results through an intuitive, visually rich dashboard.
+
+The system's threat intelligence backbone cross-references submitted domains against a local copy of the \textbf{URLhaus threat feed} — a community-maintained database of malicious URLs — that is automatically refreshed every 24 hours without manual intervention. A blacklist hit triggers an immediate \textbf{Fraudulent verdict}, bypassing further analysis.
+
+For domains not found on the blacklist, the system evaluates \textbf{domain age via WHOIS lookup}, flags newly registered domains (under 30 days) as high-risk phishing signals, and inspects \textbf{DNS records} for the presence of MX and SPF entries that legitimate businesses are expected to maintain.
+
+URL pattern analysis detects \textbf{IP-based hostnames, abusive top-level domains (.tk, .xyz, .pw), excessive hyphens, and embedded phishing keywords} — all common hallmarks of fraudulent sites. Content analysis fetches the live page and scans for urgency language, sensitive data requests, and the absence of trust indicators such as \textbf{Privacy Policy} and \textbf{Contact pages}.
+
+Going beyond static analysis, ProblySUS launches a \textbf{headless Chromium browser via Playwright} to simulate a real user visit, intercepting all HTTP responses to detect redirect chains and all outgoing requests to profile the site's external network footprint. A dedicated \textbf{network intelligence module} classifies each contacted domain as safe infrastructure (CDN/cloud), suspicious, or unknown.
+
+A \textbf{privacy auditing module} measures cookie tracking intensity, third-party script loading, and browser fingerprinting techniques (Canvas, WebGL, AudioContext, WebRTC, etc.), assigning a privacy grade from \textbf{Good} to \textbf{Invasive}. Finally, a \textbf{tracker identification module} matches loaded resources against a local database to identify named commercial trackers such as \textbf{Google Analytics, Facebook Pixel, and Hotjar}.
+
+All findings are surfaced through a detailed \textbf{results dashboard} with animated panels, a risk score gauge, color-coded labels, and an explainable reasons list — as well as through the browser extension's compact popup, which presents the same data in a tabbed interface directly within the browser.
+
+\subsection{Significance of Work}
+
+ProblySUS addresses a critical and growing need in the digital age: empowering everyday users to make informed trust decisions about the websites they visit. With online scams, phishing attacks, and fraudulent e-commerce sites becoming increasingly sophisticated, traditional single-signal detection methods — such as SSL badge checks or basic blacklist lookups — are no longer adequate.
+
+This project delivers a significant advancement by combining ten independent analysis signals into a unified, explainable risk score, reducing both false positives and false negatives through compound signal weighting.
+
+The use of a \textbf{headless browser simulation} is particularly significant, as it enables the detection of JavaScript-driven redirects and dynamically loaded malicious resources that no static HTTP-based scanner can observe. The integration of \textbf{privacy and tracker auditing} further extends the system's utility beyond pure scam detection, providing users with a holistic view of a site's data collection practices.
+
+The system's \textbf{local-first architecture} — with no third-party API keys required and a locally cached threat feed — ensures consistent performance, full privacy of submitted URLs, and zero dependency on paid external services.
+
+The key contributions of ProblySUS include:
+
 \begin{itemize}
-    \item \textbf{Fragmented Medical Records}: Patient medical information is distributed across different hospitals, making it difficult to obtain complete medical histories when required for diagnosis or treatment.
-    \item \textbf{Dependency on Physical Reports}: Patients must carry physical copies of their medical reports, which can be lost, damaged, or forgotten during emergencies.
-    \item \textbf{Repeated Diagnostic Tests}: Due to inaccessible medical histories, patients often undergo redundant tests, increasing healthcare costs and inconvenience.
-    \item \textbf{Limited Remote Consultation Options}: Many patients, especially the elderly and those in remote areas, struggle to access healthcare services that require physical presence.
-    \item \textbf{Difficulty in Obtaining Medications}: Patients face challenges in locating and purchasing rare or specific medicines that may only be available at certain hospital pharmacies.
-    \item \textbf{Lack of a Common Digital Platform}: Hospitals lack a unified digital interface to efficiently manage patient data, appointments, consultations, and billing processes.
+\item \textbf{Multi-signal composite scoring} — 10+ independent analysis modules aggregated into a single 0–100 risk score with explainable reasons.
+\item \textbf{Runtime behavior analysis} — Playwright headless browser captures JavaScript redirects and asynchronous network requests invisible to static analyzers.
+\item \textbf{Privacy and tracker auditing} — measures fingerprinting intensity and identifies named commercial trackers, providing transparency beyond basic scam detection.
+\item \textbf{Browser extension} — brings one-click URL scanning into the active browsing session with a tabbed detail view and deep-link to the web dashboard.
 \end{itemize}
-
-\section{Objectives}
-The primary objectives of the BondHealth project are:
-
-\begin{enumerate}
-    \item \textbf{Develop a Centralized Digital Platform}: Create a web-based healthcare platform that connects hospitals and patients within a specific geographical area, functioning as a digital interface for healthcare services.
-    
-    \item \textbf{Implement Digital Patient Identities}: Provide unique, secure digital IDs to patients (similar to DigiLocker) for storing and accessing medical records including consultation history, diagnostic reports, and medical scans.
-    
-    \item \textbf{Enable Hospital Discovery}: Display registered hospitals along with available departments and doctor information, allowing patients to make informed decisions about their healthcare providers.
-    
-    \item \textbf{Facilitate Remote Consultations}: Support scheduled chat and video call consultations between patients and doctors, making healthcare accessible to those unable to visit hospitals in person.
-    
-    \item \textbf{Integrate Pharmacy Services}: Enable online purchase of medicines, including rare medications, from hospital pharmacies with electronic billing for transparent, paperless transactions.
-    
-    \item \textbf{Ensure Security and Privacy}: Implement robust security measures to protect sensitive patient data and ensure compliance with healthcare data protection standards.
-\end{enumerate}
-
-\section{Scope of the Project}
-The scope of BondHealth encompasses the following aspects:
-
-\subsection{Geographical Scope}
-The platform initially targets a specific geographical area, connecting hospitals and patients within that region. This focused approach allows for better management, testing, and refinement of the system before potential expansion to wider areas.
-
-\subsection{Functional Scope}
-\begin{itemize}
-    \item \textbf{Patient Registration and Authentication}: Secure registration process assigning unique patient IDs with robust authentication mechanisms.
-    \item \textbf{Medical Records Management}: Digital storage and retrieval of consultation histories, diagnostic reports, and medical scans.
-    \item \textbf{Hospital and Doctor Directory}: Comprehensive listing of registered hospitals with department-wise doctor information.
-    \item \textbf{Teleconsultation Services}: Scheduling and conducting remote consultations through chat and video calls.
-    \item \textbf{Online Pharmacy}: E-commerce functionality for medicine purchases from hospital pharmacies.
-    \item \textbf{Electronic Billing}: Digital invoice generation and payment processing for consultations and medicine purchases.
-\end{itemize}
-
-\subsection{Technical Scope}
-The project involves developing a responsive web application using modern web technologies, implementing secure database management for medical records, integrating video calling APIs for teleconsultation, and ensuring data encryption and privacy compliance.
