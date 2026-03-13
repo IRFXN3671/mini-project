@@ -1,146 +1,150 @@
-\chapter{Technologies Used}
+\chapter{Technologies, Stacks and Tools Used}
 
-\section{Introduction}
-BondHealth leverages modern web technologies to create a robust healthcare management platform. This chapter summarizes the key technologies, frameworks, and tools employed in the project.
+This chapter outlines the technologies, development stacks, and tools used in the implementation of ProblySUS, spanning the backend analysis engine, React web frontend, and Chrome browser extension.
 
-\begin{table}[H]
-    \centering
-    \small
-    \begin{tabular}{|l|p{9cm}|}
-        \hline
-        \textbf{Component} & \textbf{Technologies} \\
-        \hline
-        Frontend & HTML5, Tailwind CSS, Bootstrap 5, Font Awesome \\
-        \hline
-        Backend & Node.js v18.17.0 LTS, Express.js v4.18.2 \\
-        \hline
-        Database & PostgreSQL v15, Neon Serverless \\
-        \hline
-        Authentication & JWT (jsonwebtoken v9.0.3), bcryptjs v3.0.3 \\
-        \hline
-        Tools & VS Code, Git, GitHub, npm v9.6.7 \\
-        \hline
-        Dependencies & cookie-parser, dotenv, pg \\
-        \hline
-    \end{tabular}
-    \caption{Technology Stack Overview}
-    \label{tab:tech-stack}
-\end{table}
+\section{Development Environment}
+
+The development of ProblySUS was carried out primarily using Visual Studio Code as the IDE across all components — backend, frontend, and extension — chosen for its rich Python and JavaScript ecosystem, integrated terminal, and Git support. The backend Python environment was managed using \texttt{venv} to isolate dependencies. Node.js and npm were used for frontend dependency management and running the Vite development server. Git was used for version control throughout the project.
 
 \section{Frontend Technologies}
 
-Frontend development utilizes HTML5 for semantic markup, Tailwind CSS for responsive utility-first styling, and Font Awesome for icons. Bootstrap 5 provides additional form and modal components for hospital registration pages. The responsive design ensures optimal viewing on desktops, tablets, and mobile devices.
+\subsection{React 19 + Vite 7}
 
-\subsection{Key Frontend Features}
-\begin{itemize}
-    \item Semantic HTML5 with form validation attributes
-    \item Tailwind CSS utility classes for custom styling (custom colors: cyan-bg, cyan-text)
-    \item Bootstrap 5 grids and components for forms
-    \item Font Awesome icons (6400+) for navigation and actions
-    \item Client-side data persistence with localStorage
-    \item Custom CSS animations (fade-in, slide-in, hover effects)
-\end{itemize}
+The web frontend is built with React 19, a component-based JavaScript library that enables reactive, state-driven UIs. Vite 7 serves as the build tool and development server, providing near-instant hot module replacement and optimised production builds.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.85\textwidth]{images/chapter6/web_home_url_input.png}
+\caption{Web Application Home Page — URL Input Interface}
+\label{fig:web_home}
+\end{figure}
+
+\subsection{Tailwind CSS v4}
+
+Tailwind CSS v4 is used for styling through utility classes. Its just-in-time compilation ensures minimal CSS bundle size and efficient rendering.
+
+\subsection{Framer Motion}
+
+Framer Motion provides UI animations such as fade-in panel transitions and animated privacy exposure bars.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.85\textwidth]{images/chapter6/dashboard_panels.png}
+\caption{Analysis Result Dashboard with Animated Panels}
+\label{fig:dashboard_panels}
+\end{figure}
+
+\subsection{Axios}
+
+Axios handles all HTTP communication between the React frontend and the Flask backend by sending POST requests to the analysis endpoint and receiving structured JSON responses.
 
 \section{Backend Technologies}
 
-\subsection{Node.js and Express.js}
-Node.js v18.17.0 (LTS) runs the application server on port 3005 using an event-driven, non-blocking I/O model. Express.js v4.18.2 provides the core framework with routing, middleware, and error handling for 30+ API endpoints.
+\subsection{Python 3 / Flask}
 
-Key usage:
-\begin{itemize}
-    \item Event loop for efficient concurrent request handling
-    \item File system module (fs) for serving HTML templates
-    \item Middleware for authentication, authorization, and logging
-    \item Error handling with try-catch blocks
-\end{itemize}
+The backend API is developed using Python 3 and the Flask micro-framework. Flask-CORS allows cross-origin requests from the React frontend and browser extension.
 
-\subsection{PostgreSQL and Neon Serverless}
-PostgreSQL v15 provides the relational database with 15+ tables maintaining ACID compliance and data integrity. Neon serverless platform enables automatic scaling and connection pooling without infrastructure management.
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.8\textwidth]{images/chapter6/flask_routes.png}
+\caption{Flask app.py Route Definitions and ThreadPoolExecutor Block}
+\label{fig:flask_routes}
+\end{figure}
 
-Database features:
-\begin{itemize}
-    \item Foreign key relationships for data consistency
-    \item UUID primary keys for distributed systems
-    \item Indexing for query performance
-    \item Point-in-time recovery for data protection
-    \item SSL connections for encrypted communication
-\end{itemize}
+\subsection{Concurrent Execution — ThreadPoolExecutor}
 
-\section{Authentication \& Security}
+Python's \texttt{ThreadPoolExecutor} enables concurrent execution of network-dependent modules such as WHOIS lookup, DNS queries, and content analysis, reducing total processing time.
 
-\subsection{JWT and bcryptjs}
-JSON Web Tokens (jsonwebtoken v9.0.3) handle stateless authentication with 7-day expiration. bcryptjs v3.0.3 provides password hashing with 10 salt rounds against rainbow table attacks.
+\subsection{Playwright + Chromium}
 
-\subsection{Security Implementation}
-\begin{itemize}
-    \item Role-based access control (RBAC) middleware for four distinct roles
-    \item HTTP-only cookies for token storage (prevents XSS)
-    \item Parameterized queries to prevent SQL injection
-    \item Input validation and sanitization
-    \item Secure password comparison with timing-safe functions
-\end{itemize}
+Playwright is used to launch a headless Chromium browser to simulate real browsing behavior and capture redirects and external requests.
 
-\section{Development Tools}
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.8\textwidth]{images/chapter6/playwright_logic.png}
+\caption{Playwright Launch and Network Interception Logic}
+\label{fig:playwright_logic}
+\end{figure}
 
-Version control with Git and GitHub enables collaborative development using feature branches and pull requests. VS Code with extensions (LaTeX Workshop, Thunder Client, Prettier) streamlines development. npm v9.6.7 manages all project dependencies defined in package.json, including:
+\subsection{Analysis Libraries}
 
-\begin{itemize}
-    \item Production: express, pg, jsonwebtoken, bcryptjs, cookie-parser, dotenv
-    \item Development: nodemon (auto-reload), concurrently (parallel process execution)
-\end{itemize}
+\begin{table}[h]
+\centering
+\begin{tabular}{ll}
+\toprule
+Library & Purpose \\
+\midrule
+requests & HTTP requests and feed downloads \\
+python-whois & Domain registration queries \\
+dnspython & DNS lookups for MX and SPF records \\
+beautifulsoup4 & HTML parsing for analysis modules \\
+tldextract & Domain extraction from URLs \\
+textstat & Content readability scoring \\
+re & Regular expression matching \\
+csv / zipfile & URLhaus feed extraction \\
+\bottomrule
+\end{tabular}
+\caption{Backend Analysis Libraries}
+\end{table}
 
-\section{Project Structure}
+\section{Browser Extension Technologies}
 
-BondHealth follows a modular architecture with clear separation of concerns:
+The browser extension is built using Manifest V3 and plain HTML, CSS, and JavaScript for the popup interface.
 
-\begin{itemize}
-    \item \textbf{src/} - Main source code directory
-    \begin{itemize}
-        \item \textbf{db/} - Database configuration files
-        \begin{itemize}
-            \item \texttt{config.js} - Database connection
-            \item \texttt{init.js} - Database initialization
-            \item \texttt{init.sql} - SQL schema (15+ tables)
-            \item \texttt{seed.js} - Seed data
-            \item \texttt{seed-reviews.js} - Review data seeding
-        \end{itemize}
-        \item \texttt{Patient.js} - Patient dashboard module
-        \item \texttt{Doctor.js} - Doctor dashboard module
-        \item \texttt{admin.js} - Admin dashboard module
-        \item \texttt{labs.js} - Lab technician module
-        \item \texttt{signin.js} - Authentication server
-        \item \texttt{home.js} - Main server with 30+ API endpoints
-        \item \texttt{Hospital.js} - Hospital management module
-        \item \texttt{HospitalRegistration.js} - Hospital registration
-        \item \texttt{signup\_patient.js} - Patient registration
-        \item \texttt{clone.js} - Appointment booking demo
-    \end{itemize}
-    \item \texttt{.env} - Environment variables
-    \item \texttt{.gitignore} - Git ignore rules
-    \item \texttt{package.json} - Dependencies and scripts
-    \item \texttt{README.md} - Project documentation
-\end{itemize}
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.75\textwidth]{images/chapter6/extension_overview.png}
+\caption{Chrome Extension Popup — Overview Tab}
+\label{fig:extension_overview}
+\end{figure}
 
-\section{Deployment Configuration}
+The score arc is implemented using CSS transforms and transitions.
 
-The application uses environment variables (dotenv v17.3.1) for configuration:
-\begin{itemize}
-    \item \textbf{Development}: Local/Neon DB with debug logging
-    \item \textbf{Production}: Neon serverless PostgreSQL with SSL, connection pooling, and optimized security settings
-\end{itemize}
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.75\textwidth]{images/chapter6/extension_privacy_tab.png}
+\caption{Chrome Extension Popup — Behavior and Privacy Tabs}
+\label{fig:extension_privacy_tab}
+\end{figure}
 
-\section{Advantages of Technology Stack}
+\section{Threat Intelligence Tools}
 
-\subsection{Performance}
-Non-blocking I/O in Node.js handles multiple concurrent connections efficiently. Tailwind CSS's production build purges unused styles. Database connection pooling optimizes query execution.
+\subsection{URLhaus Feed}
 
-\subsection{Scalability}
-Serverless PostgreSQL with Neon automatically scales compute resources. Modular architecture supports horizontal scaling. Stateless JWT authentication eliminates session bottlenecks.
+URLhaus provides a community-maintained dataset of malicious URLs distributed as a ZIP-compressed CSV feed.
 
-\subsection{Security}
-Industry-standard JWT authentication with role-based access control. bcryptjs password hashing with adequate salt rounds. Parameterized queries prevent SQL injection. HTTP-only cookies mitigate XSS attacks.
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.75\textwidth]{images/chapter6/urlhaus_updater_logic.png}
+\caption{URLhaus Feed Download and Auto-Refresh Logic}
+\label{fig:urlhaus_updater}
+\end{figure}
 
-\subsection{Developer Experience}
-Express.js minimal framework reduces boilerplate. Tailwind CSS utility-first approach accelerates UI development. Git version control with branching strategy supports team collaboration. Clear project structure aids code maintainability.
+\subsection{Local Tracker Database}
 
-The combination of these technologies provides a solid foundation for a responsive, secure, and scalable healthcare platform serving patients, doctors, administrators, and lab technicians.
+A local \texttt{trackers.json} file maps known tracker domains to human-readable tracker names used during tracker detection.
+
+\section{Testing Tools}
+
+Postman was used for API endpoint testing, while Chrome DevTools was used for debugging frontend components and browser extension behavior. A custom \texttt{test\_scorer.py} script was used to unit-test the scoring engine independently.
+
+\section{Version Control and Project Management}
+
+Git was used for version control with a GitHub repository serving as the central codebase. The repository contains the full source tree including \texttt{backend/}, \texttt{frontend/}, \texttt{extension/}, and documentation files.
+
+\section{Deployment}
+
+ProblySUS currently runs locally with the Flask backend hosted at \texttt{http://127.0.0.1:5000} and the Vite frontend at \texttt{http://localhost:5173}. The Chrome extension is loaded as an unpacked extension via developer mode.
+
+\section{Security Considerations}
+
+Several security safeguards are implemented since the system analyzes potentially malicious URLs.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.8\textwidth]{images/chapter6/error_handler_validation.png}
+\caption{Global Error Handling and Input Validation Logic in app.py}
+\label{fig:error_handler}
+\end{figure}
+
+Playwright runs in a sandboxed environment and does not persist cookies between scans. All user input is validated before analysis, and error responses always return JSON to avoid exposing internal server details.
