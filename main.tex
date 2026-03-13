@@ -178,7 +178,6 @@
 % ============ HEADER AND FOOTER CONFIGURATION ============
 \fancypagestyle{plain}{
     \fancyhf{}
-    \fancyhead[L]{problySUS}
     \renewcommand{\headrulewidth}{0pt}
     \renewcommand{\footrulewidth}{0pt}
     \fancyfoot[C]{\thepage}
@@ -196,7 +195,6 @@
 
 \fancypagestyle{footeronly}{
     \fancyhf{}
-  \fancyhead[L]{problySUS}
     \renewcommand{\headrulewidth}{0pt}
     \renewcommand{\footrulewidth}{0pt}
     \fancyfoot[C]{\thepage}
@@ -231,11 +229,15 @@
 \include{abstract}
 
 \pagestyle{footeronly}
-\tableofcontents
-\thispagestyle{footeronly}
+\phantomsection
+\addcontentsline{toc}{chapter}{\listfigurename}
 \listoffigures
 \thispagestyle{footeronly}
+\phantomsection
+\addcontentsline{toc}{chapter}{\listtablename}
 \listoftables
+\thispagestyle{footeronly}
+\tableofcontents
 \thispagestyle{footeronly}
 
 \clearpage
