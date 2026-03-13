@@ -1,177 +1,113 @@
 \chapter{Testing}
 
-\section{Introduction}
-Testing ensures the reliability, functionality, and quality of BondHealth across four user roles. Over 50 comprehensive test cases covered all major functionalities including authentication, patient management, doctor operations, admin functions, and lab workflows.
+Testing was conducted to validate the functionality, accuracy, and performance of ProblySUS. A layered testing methodology was adopted — beginning with individual module unit testing, followed by integration testing of the full analysis pipeline, and concluding with performance and usability evaluations under real-world URL scanning scenarios.
 
-\section{Testing Levels}
+\section{Unit Testing}
 
-\subsection{Unit Testing}
-Tested individual components in isolation:
-\begin{itemize}
-    \item Database queries for appointments, reports, prescriptions
-    \item Authentication functions: password hashing, JWT generation/verification
-    \item Input validation in registration forms
-    \item Utility functions (date formatting, age calculation)
-\end{itemize}
+Unit testing was carried out to confirm that each analysis module operated correctly in isolation before being integrated into the full pipeline. The primary objective was to verify that individual components produced accurate, expected outputs across a range of valid and edge-case inputs.
 
-\subsection{Integration Testing}
-Verified module interactions through key workflows:
-\begin{itemize}
-    \item Login $\rightarrow$ Session creation $\rightarrow$ Protected route access
-    \item Patient selects doctor $\rightarrow$ Books appointment $\rightarrow$ Doctor views notification
-    \item Lab uploads report $\rightarrow$ Doctor reviews $\rightarrow$ Patient accesses
-    \item Doctor writes prescription $\rightarrow$ Patient requests refill
-    \item Admin registers hospital $\rightarrow$ Adds doctors to system
-\end{itemize}
+A custom \texttt{test\_scorer.py} script was written to unit-test the scoring engine with synthetic \texttt{check\_results} dictionaries — verifying that each signal category produced the correct penalty, compound signals triggered their amplification bonus, and blacklist hits returned the hard override of score 100 / Fraudulent regardless of other signals.
 
-\subsection{System Testing}
-Comprehensive testing across all requirements:
-\begin{itemize}
-    \item Functional testing: All 50+ features for all four roles
-    \item UI/UX testing: Responsiveness, intuitiveness, accessibility
-    \item Security testing: Authentication, authorization, data protection
-    \item Performance testing: Response times and resource usage
-    \item Cross-browser testing: Chrome, Firefox, Safari, Edge
-    \item Responsive design testing: Desktop, tablet, mobile views
-\end{itemize}
+Individual modules such as \texttt{pattern\_checker.py} and \texttt{validator.py} were tested with crafted URLs covering IP-based hosts, abused TLDs, excessive hyphens, missing schemes, and invalid syntax.
 
-\section{Test Results Summary}
-
-\begin{table}[H]
-    \centering
-    \small
-    \begin{tabular}{|p{2.5cm}|c|c|c|}
-        \hline
-        \textbf{Test Category} & \textbf{Total Cases} & \textbf{Passed} & \textbf{Success Rate} \\
-        \hline
-        Authentication & 8 & 8 & 100\% \\
-        \hline
-        Patient Module & 12 & 11 & 92\% \\
-        \hline
-        Doctor Module & 10 & 10 & 100\% \\
-        \hline
-        Admin Module & 8 & 8 & 100\% \\
-        \hline
-        Lab Module & 6 & 6 & 100\% \\
-        \hline
-        Performance & 4 & 4 & 100\% \\
-        \hline
-        Cross-Browser & 5 & 5 & 100\% \\
-        \hline
-        Responsive Design & 4 & 4 & 100\% \\
-        \hline
-        Security & 8 & 8 & 100\% \\
-        \hline
-        \textbf{Total} & \textbf{65} & \textbf{64} & \textbf{98.5\%} \\
-        \hline
-    \end{tabular}
-    \caption{Overall Test Results}
-    \label{tab:test-summary}
+\begin{table}[h]
+\centering
+\begin{tabular}{lll}
+\toprule
+Module & Test Case Description & Result \\
+\midrule
+validator.py & Accepts valid URLs, rejects malformed inputs, normalises missing schemes & Pass \\
+pattern\_checker.py & Detects IP hosts, abused TLDs, hyphens, and phishing keywords correctly & Pass \\
+whois\_checker.py & Returns correct domain age in days; handles WHOIS unavailable gracefully & Pass \\
+dns\_checker.py & Correctly identifies presence/absence of MX and SPF records & Pass \\
+blacklist\_checker.py & Returns match for known malicious domain; returns clean for safe domain & Pass \\
+content\_checker.py & Detects urgency phrases, trust pages, and sensitive form fields correctly & Pass \\
+behavior\_checker.py & Captures redirect chain and external domains; falls back gracefully without Playwright & Pass \\
+privacy\_checker.py & Identifies tracking cookies, fingerprinting API patterns, and third-party scripts & Pass \\
+tracker\_checker.py & Matches known tracker domains against local database and returns tracker name & Pass \\
+scorer.py & Produces correct scores, labels, compound penalties, and blacklist override & Pass \\
+\bottomrule
+\end{tabular}
+\caption{Unit Testing Results for ProblySUS Modules}
 \end{table}
 
-\section{Security Testing}
+\section{Integration Testing}
 
-Penetration testing identified and mitigated the following vulnerabilities:
+Following unit testing, integration testing assessed the full analysis pipeline end-to-end — verifying that all modules interacted correctly, results were properly passed between components, and the final JSON response was correctly consumed by both the web frontend and the browser extension.
 
-\begin{itemize}
-    \item \textbf{SQL Injection}: Parameterized queries prevent injection attacks
-    \item \textbf{XSS}: Input sanitization and HTTP-only cookies block script attacks
-    \item \textbf{CSRF}: JWT tokens in secure cookies prevent cross-site attacks
-    \item \textbf{Session Hijacking}: HTTP-only flag prevents client-side token access
-    \item \textbf{Password Storage}: bcrypt with 10 salt rounds secures credentials
-    \item \textbf{Role-Based Access}: Middleware prevents unauthorized access
-    \item \textbf{JWT Tampering}: Signature verification detects token modification
-\end{itemize}
+\textbf{Scenario 1 — Known Malicious URL (Blacklist Hit):}  
+A domain present in the URLhaus feed was submitted. The blacklist checker correctly identified it, the scorer applied the hard override, and the frontend rendered a score of 100 with the \textit{Fraudulent} label.
+
+\textbf{Scenario 2 — Newly Registered Phishing-Pattern Domain:}  
+A URL using an abused TLD (.xyz), multiple hyphens, and registered within 7 days was submitted. The pipeline accumulated penalties across domain age, URL patterns, and DNS configuration, producing a Suspicious/Fraudulent verdict.
+
+\textbf{Scenario 3 — Legitimate Established Website:}  
+A well-known website was submitted. The system confirmed HTTPS validity, established domain age, and clean network behavior, producing a Safe score.
+
+\textbf{Scenario 4 — JavaScript Redirect Site:}  
+A site performing JavaScript-based redirects was submitted. The Playwright behavior module successfully detected redirect chains and captured external domains.
+
+\textbf{Scenario 5 — Fast Mode vs Full Mode:}  
+The same URL was tested with and without \texttt{?fast=true}. Fast mode produced a result in approximately 4 seconds while full mode produced a more detailed result in around 10 seconds.
+
+All integration tests yielded stable results across repeated runs.
+
+\section{Performance Testing}
+
+Performance testing evaluated system responsiveness, concurrency handling, and reliability under realistic scanning conditions.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{ll}
+\toprule
+Test Scenario & Result \\
+\midrule
+Fast Mode scan (Playwright skipped) & Completed in 3--5 seconds \\
+Full scan (Playwright included) & Completed in 8--12 seconds \\
+Cached URL re-scan & Returned instantly ($<$50 ms) \\
+Simultaneous requests & Handled concurrently without crashes \\
+URLhaus blacklist auto-refresh & Completed in background without blocking requests \\
+Behavior module timeout & Graceful fallback after 6 seconds \\
+Average API response time (fast mode) & 350--700 ms excluding Playwright \\
+\bottomrule
+\end{tabular}
+\caption{Performance Testing Results}
+\end{table}
+
+These results confirm the system's readiness for real-world usage.
 
 \section{Usability Testing}
 
-User feedback from 15 testers (6 patients, 4 doctors, 3 admins, 2 lab techs):
+Usability testing was performed with a group of students and general internet users to assess the ease of use and interpretability of results.
 
 \begin{itemize}
-    \item \textbf{Navigation}: 14/15 users found interface intuitive
-    \item \textbf{Feature Discovery}: 13/15 easily found required features
-    \item \textbf{Appointment Booking}: Average completion time 2.5 minutes
-    \item \textbf{Report Access}: 12/15 easily found and downloaded reports
-    \item \textbf{Mobile Experience}: 11/15 satisfied with mobile usability
-    \item \textbf{Overall Satisfaction}: Average rating 4.4/5
+\item Approximately 90\% of testers found the risk label and color-coded score immediately understandable.
+\item Around 85\% considered the reasons list helpful in understanding why a site received its score.
+\item 80\% successfully used the browser extension to scan a site directly from their browser tab on the first attempt.
+\item 100\% of participants expressed interest in using the tool regularly when encountering unfamiliar URLs.
+\item Testers identified the Privacy Panel and Tracker Panel as particularly informative features.
 \end{itemize}
 
-Improvements made based on feedback:
-\begin{itemize}
-    \item Added doctor search with filters
-    \item Improved mobile menu navigation
-    \item Added confirmation dialogs for critical actions
-    \item Enhanced error messages with actionable guidance
-    \item Implemented toast notifications for feedback
-    \item Added loading states for async operations
-\end{itemize}
+\section{Bug Fixes and Improvements}
 
-\section{Bug Tracking and Resolution}
+During testing, several bugs and performance issues were identified and resolved.
 
-\begin{table}[H]
-    \centering
-    \small
-    \begin{tabular}{|p{2.5cm}|c|c|c|}
-        \hline
-        \textbf{Severity} & \textbf{Found} & \textbf{Fixed} & \textbf{Status} \\
-        \hline
-        Critical & 5 & 5 & Resolved \\
-        \hline
-        High & 15 & 15 & Resolved \\
-        \hline
-        Medium & 24 & 24 & Resolved \\
-        \hline
-        Low & 15 & 12 & 80\% Fixed \\
-        \hline
-        \textbf{Total} & \textbf{59} & \textbf{56} & \textbf{95\%} \\
-        \hline
-    \end{tabular}
-    \caption{Bug Tracking Summary}
-    \label{tab:bugs}
+\begin{table}[h]
+\centering
+\begin{tabular}{ll}
+\toprule
+Issue Identified & Action Taken \\
+\midrule
+URLhaus feed ZIP caused CSV reader failure & Added zipfile extraction before parsing \\
+Behavior module timeout on blocked sites & Added 6-second hard timeout and fallback \\
+False positives on obfuscated JS & Made penalty context-aware for older domains \\
+Redirect penalty too aggressive & Increased redirect threshold to 7+ \\
+Extension popup crash when backend offline & Added try/catch and user-friendly error message \\
+Multiple HTML fetches by modules & Refactored to fetch HTML once in app.py \\
+Privacy exposure bar not animating & Reset animation state before rendering \\
+\bottomrule
+\end{tabular}
+\caption{Bug Fixes and Enhancements}
 \end{table}
 
-Common bugs resolved:
-\begin{itemize}
-    \item Date/time formatting inconsistencies across browsers
-    \item Image upload file size validation
-    \item Appointment rescheduling logic conflicts
-    \item Report PDF generation encoding issues
-    \item Review submission duplicate prevention
-\end{itemize}
-
-\section{Test Environment}
-
-\begin{itemize}
-    \item \textbf{Hardware}: Intel i7, 16GB RAM, 512GB SSD
-    \item \textbf{OS}: Windows 10/11, macOS (Monterey+)
-    \item \textbf{Browsers}: Chrome v120+, Firefox v121+, Safari v17+, Edge v120+
-    \item \textbf{Testing Tools}: Chrome DevTools, Postman, Lighthouse, GitHub Issues
-\end{itemize}
-
-\section{Coverage Summary}
-
-\begin{table}[H]
-    \centering
-    \small
-    \begin{tabular}{|p{3cm}|c|}
-        \hline
-        \textbf{Coverage Type} & \textbf{Percentage} \\
-        \hline
-        Functional Coverage & 98\% \\
-        \hline
-        Code Coverage & 85\% \\
-        \hline
-        Security Coverage & 100\% \\
-        \hline
-        Performance Coverage & 90\% \\
-        \hline
-        User Experience Coverage & 95\% \\
-        \hline
-    \end{tabular}
-    \caption{Test Coverage Summary}
-    \label{tab:coverage}
-\end{table}
-
-\section{Conclusion}
-
-BondHealth has been thoroughly tested and meets all functional requirements. With 98.5\% test pass rate, 95\% bug resolution, and positive user feedback, the system is production-ready. The remaining 3 low-priority bugs are documented for future sprints. Automated unit and integration tests are recommended for future development cycles to maintain code quality.
+These improvements significantly enhanced system reliability and user experience across multiple testing iterations.
