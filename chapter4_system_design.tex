@@ -14,13 +14,47 @@ The \textbf{Output Layer} delivers a structured JSON risk report rendered as an 
 
 On the server side, the system manages URL validation, parallel execution of analysis modules, threat intelligence lookups, result caching, and auto-updating of the local blacklist feed. All outputs are returned to the client as a single structured JSON response consumed by both the web frontend and the browser extension. The architecture requires no user authentication since no personal data is stored. Only URL scan results are temporarily cached in memory for 30 minutes.
 
+\section{Overall System Architecture Flowchart}
+
+Figure~\ref{fig:overall_architecture_flow} provides a high-level flowchart of the complete ProblySUS workflow from URL submission to final risk presentation. It shows how user input is validated, distributed to parallel analysis modules, merged by the scoring engine, and then returned to both client interfaces.
+
+\begin{figure}[!htbp]
+\centering
+\fbox{%
+\begin{minipage}{0.95\textwidth}
+\centering
+\textbf{User Sources}\\[3pt]
+Web App URL Input \quad + \quad Chrome Extension Active Tab\\[8pt]
+$\downarrow$\\[8pt]
+\textbf{Input Validation Layer}\\[3pt]
+URL normalization, syntax checks, HTTPS/TLS verification\\[8pt]
+$\downarrow$\\[8pt]
+\textbf{Parallel Analysis Pipeline}\\[3pt]
+WHOIS \;|\; DNS \;|\; URL Pattern \;|\; Content \;|\; Blacklist\\
+Behavior \;|\; Network \;|\; Privacy \;|\; Tracker Detection\\[8pt]
+$\downarrow$\\[8pt]
+\textbf{Aggregation and Scoring Engine}\\[3pt]
+Weighted penalties, compound signals, risk label generation\\[8pt]
+$\downarrow$\\[8pt]
+\textbf{Response and Presentation Layer}\\[3pt]
+Structured JSON report $\rightarrow$ Dashboard + Extension Tabs\\
+\end{minipage}%
+}
+\caption{Overall System Architecture Flowchart of ProblySUS}
+\label{fig:overall_architecture_flow}
+\end{figure}
+
+This flowchart clarifies the control flow and data flow across all major components. It highlights that ProblySUS does not rely on a monolithic scan step; instead, it runs specialized modules in parallel and fuses their outputs into one explainable and user-friendly result.
+
 \section{Data Flow Diagram (DFD)}
 
 The Data Flow Diagram illustrates how data moves from the user to the analysis modules and finally to the generated risk report. When a user submits a URL through the web application or browser extension, the system validates the URL and distributes it across multiple analysis modules operating in parallel.
 
 Each module independently analyzes a particular signal domain and returns structured results. These results are then aggregated by the scoring engine to compute the final composite risk score and generate a labeled report returned to the client interface.
 
-\begin{figure}[h]
+The following figure illustrates the operational data path of a scan request in detail. It emphasizes how the same input URL is propagated to multiple analysis modules, then consolidated into a single report, ensuring both analytical depth and consistent output formatting.
+
+\begin{figure}[!htbp]
 \centering
 \includegraphics[width=0.85\textwidth]{images/chapter4/dfd_problysus.png}
 \caption{Data Flow Diagram of ProblySUS}
@@ -43,12 +77,14 @@ ProblySUS has a single primary user role called the \textbf{End User}. The end u
 
 Additionally, the system includes a background component known as the \textbf{System Daemon}. This component automatically refreshes the blacklist feed every 24 hours without requiring user interaction.
 
-\begin{figure}[h]
+\begin{figure}[!htbp]
 \centering
 \includegraphics[width=0.75\textwidth]{images/chapter4/usecase_problysus.png}
 \caption{Use Case Diagram of ProblySUS}
 \label{fig:usecase_problysus}
 \end{figure}
+
+This use case view clarifies user-facing functionality and background automation responsibilities. It helps distinguish actions explicitly initiated by the end user from periodic system tasks such as blacklist refresh, which improves reliability without increasing user effort.
 
 \section{Data Design}
 
@@ -58,7 +94,7 @@ ProblySUS is stateless by design and does not rely on a persistent database. Ins
 
 \begin{table}[h]
 \centering
-\begin{tabular}{lll}
+\begin{tabular}{|lll|}
 \toprule
 Property & Description & Type \\
 \midrule
@@ -74,7 +110,7 @@ expiry & Timestamp of cache expiration (30 min TTL) & DateTime \\
 
 \begin{table}[h]
 \centering
-\begin{tabular}{lll}
+\begin{tabular}{|lll|}
 \toprule
 Property & Description & Type \\
 \midrule
@@ -98,7 +134,7 @@ The scoring engine implemented in \texttt{scorer.py} serves as the analytical co
 
 \begin{table}[h]
 \centering
-\begin{tabular}{lll}
+\begin{tabular}{|lll|}
 \toprule
 Signal Category & Max Penalty & Rationale \\
 \midrule

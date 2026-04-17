@@ -139,6 +139,19 @@
     right=1in
 }
 
+% Float tuning to reduce blank space around figures
+\setlength{\textfloatsep}{10pt plus 2pt minus 2pt}
+\setlength{\floatsep}{8pt plus 2pt minus 2pt}
+\setlength{\intextsep}{8pt plus 2pt minus 2pt}
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.8}
+\renewcommand{\textfraction}{0.07}
+\renewcommand{\floatpagefraction}{0.8}
+\setcounter{topnumber}{3}
+\setcounter{bottomnumber}{2}
+\setcounter{totalnumber}{5}
+\raggedbottom
+
 
 % Line spacing
 \setstretch{1.15}
@@ -255,6 +268,4 @@
 \include{chapter9_conclusion}
 
 \include{references}
-
-
 \end{document}

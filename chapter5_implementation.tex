@@ -10,65 +10,77 @@ ProblySUS was implemented as four major components: frontend web application, ba
 
 \subsection{Frontend Development (React + Vite + Tailwind CSS v4)}
 
-\begin{figure}[h]
+\begin{figure}[!htbp]
 \centering
 \includegraphics[width=0.85\textwidth]{images/chapter5/frontend_home.png}
 \caption{Home Page / URL Input Screen}
 \label{fig:frontend_home}
 \end{figure}
 
+The following figure shows the initial URL submission interface used to start a scan.
+
 The frontend is built with React using Vite as the build tool and Tailwind CSS for styling. Axios handles HTTP communication with the backend.
 
 The home page provides a minimal interface containing a single URL input bar. The input supports deep-linking where the application reads the \texttt{?url=} query parameter and automatically triggers analysis.
 
-\begin{figure}[h]
+\begin{figure}[!htbp]
 \centering
 \includegraphics[width=0.85\textwidth]{images/chapter5/dashboard_score.png}
 \caption{Analysis Results Dashboard — Score Gauge and Risk Label}
 \label{fig:dashboard_score}
 \end{figure}
 
+The following figure presents the main risk result view with score gauge and label.
+
 Upon receiving backend results, the dashboard renders the composite risk score gauge, colour-coded risk label, recommendation string, and an ordered list of reasons.
 
-\begin{figure}[h]
+\begin{figure}[!htbp]
 \centering
 \includegraphics[width=0.8\textwidth]{images/chapter5/behavior_panel.png}
 \caption{Behavior Panel — Redirects, External Requests, Suspicious Domains}
 \label{fig:behavior_panel}
 \end{figure}
 
+The following figure highlights runtime behavior indicators such as redirects and external requests.
+
 The Behavior Panel displays redirect count, external requests, suspicious domains, redirect chains, and the final page title.
 
-\begin{figure}[h]
+\begin{figure}[!htbp]
 \centering
 \includegraphics[width=0.8\textwidth]{images/chapter5/network_panel.png}
 \caption{Network Panel — Domain Classification and Risk Level}
 \label{fig:network_panel}
 \end{figure}
 
+The following figure shows network-level domain classification and overall network risk.
+
 The Network Panel presents the external domain count, safe infrastructure domains, suspicious domains, and overall network risk classification.
 
-\begin{figure}[h]
+\begin{figure}[!htbp]
 \centering
 \includegraphics[width=0.8\textwidth]{images/chapter5/privacy_panel.png}
 \caption{Privacy Panel — Exposure Bar, Fingerprinting Indicators, Cookie Counts}
 \label{fig:privacy_panel}
 \end{figure}
 
+The following figure summarizes privacy exposure using cookies, scripts, and fingerprinting signals.
+
 The Privacy Panel displays privacy grade, exposure bar, cookie counts, third-party scripts, and fingerprinting signals.
 
-\begin{figure}[h]
+\begin{figure}[!htbp]
 \centering
 \includegraphics[width=0.8\textwidth]{images/chapter5/tracker_panel.png}
 \caption{Tracker Panel — Named Tracker Detection}
 \label{fig:tracker_panel}
 \end{figure}
 
+The following figure lists detected tracker services and their matched domains.
+
 The Tracker Panel shows detected trackers including tracker name, matched domain, and HTML element type.
 
 \subsection{Backend Development (Python / Flask)}
 
-\begin{figure}[h]
+\begin{figure}[!htbp]
 \centering
 \includegraphics[width=0.8\textwidth]{images/chapter5/backend_routes.png}
 \caption{app.py Route Structure and Parallel Execution}
@@ -79,7 +91,7 @@ The backend is implemented in Flask. The primary endpoint \texttt{POST /analyze}
 
 Fast checks execute first, while slower network-dependent checks are executed concurrently using \texttt{ThreadPoolExecutor}. HTML content is fetched once and reused across multiple modules.
 
-\begin{figure}[h]
+\begin{figure}[!htbp]
 \centering
 \includegraphics[width=0.75\textwidth]{images/chapter5/scoring_logic.png}
 \caption{scorer.py Weighted Penalty Calculation}
@@ -90,7 +102,7 @@ All module outputs are passed to \texttt{calculate\_risk\_score()} in \texttt{sc
 
 \subsection{Analysis Module Implementation}
 
-\begin{figure}[h]
+\begin{figure}[!htbp]
 \centering
 \includegraphics[width=0.75\textwidth]{images/chapter5/validator_pattern.png}
 \caption{validator.py and pattern\_checker.py Implementation}
@@ -101,7 +113,7 @@ The \texttt{validator.py} module normalises URLs and verifies HTTPS/TLS certific
 
 The \texttt{pattern\_checker.py} module performs lexical URL inspection to detect suspicious patterns.
 
-\begin{figure}[h]
+\begin{figure}[!htbp]
 \centering
 \includegraphics[width=0.75\textwidth]{images/chapter5/behavior_checker.png}
 \caption{behavior\_checker.py Playwright Intercept Logic}
@@ -110,7 +122,7 @@ The \texttt{pattern\_checker.py} module performs lexical URL inspection to detec
 
 The behavior module launches a headless Chromium browser using Playwright and intercepts redirect responses and network requests.
 
-\begin{figure}[h]
+\begin{figure}[!htbp]
 \centering
 \includegraphics[width=0.75\textwidth]{images/chapter5/privacy_checker.png}
 \caption{privacy\_checker.py Cookie and Fingerprinting Detection}
@@ -121,7 +133,7 @@ The privacy module inspects cookies, tracking scripts, and browser fingerprintin
 
 \subsection{Threat Intelligence Data Layer}
 
-\begin{figure}[h]
+\begin{figure}[!htbp]
 \centering
 \includegraphics[width=0.75\textwidth]{images/chapter5/urlhaus_updater.png}
 \caption{URLhaus Feed Download and CSV Extraction}
@@ -132,31 +144,37 @@ The threat intelligence layer downloads the URLhaus blacklist feed and loads it 
 
 \subsection{Browser Extension Implementation}
 
-\begin{figure}[h]
+\begin{figure}[!htbp]
 \centering
 \includegraphics[width=0.75\textwidth]{images/chapter5/extension_overview.png}
 \caption{Browser Extension Popup — Overview Tab}
 \label{fig:extension_overview}
 \end{figure}
 
+The following figure shows the extension overview tab with the primary risk summary.
+
 The Chrome extension uses Manifest V3 and communicates with the Flask backend to analyze the active tab URL.
 
-\begin{figure}[h]
+\begin{figure}[!htbp]
 \centering
 \includegraphics[width=0.75\textwidth]{images/chapter5/extension_privacy.png}
 \caption{Browser Extension Popup — Behavior and Privacy Tabs}
 \label{fig:extension_privacy}
 \end{figure}
 
+The following figure presents detailed behavior and privacy insights inside the extension popup.
+
 The popup UI displays the score arc, risk label, status indicators, and detailed analysis tabs.
 
 \subsection{Fast Mode and Caching}
 
-\begin{figure}[h]
+\begin{figure}[!htbp]
 \centering
 \includegraphics[width=0.75\textwidth]{images/chapter5/cache_fastmode.png}
 \caption{Fast Mode and Result Cache Logic in app.py}
 \label{fig:cache_fastmode}
 \end{figure}
+
+The following figure illustrates how fast mode and caching improve repeated scan performance.
 
 Fast Mode bypasses Playwright runtime analysis to reduce total execution time. A result cache stores recently analyzed URLs for 30 minutes to prevent redundant scans.

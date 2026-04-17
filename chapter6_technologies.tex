@@ -12,12 +12,14 @@ The development of ProblySUS was carried out primarily using Visual Studio Code 
 
 The web frontend is built with React 19, a component-based JavaScript library that enables reactive, state-driven UIs. Vite 7 serves as the build tool and development server, providing near-instant hot module replacement and optimised production builds.
 
-\begin{figure}[h]
+\begin{figure}[!htbp]
 \centering
 \includegraphics[width=0.85\textwidth]{images/chapter6/web_home_url_input.png}
 \caption{Web Application Home Page — URL Input Interface}
 \label{fig:web_home}
 \end{figure}
+
+The following figure shows the web application's URL input page where analysis begins.
 
 \subsection{Tailwind CSS v4}
 
@@ -27,12 +29,14 @@ Tailwind CSS v4 is used for styling through utility classes. Its just-in-time co
 
 Framer Motion provides UI animations such as fade-in panel transitions and animated privacy exposure bars.
 
-\begin{figure}[h]
+\begin{figure}[!htbp]
 \centering
 \includegraphics[width=0.85\textwidth]{images/chapter6/dashboard_panels.png}
 \caption{Analysis Result Dashboard with Animated Panels}
 \label{fig:dashboard_panels}
 \end{figure}
+
+The following figure demonstrates the dashboard layout used to present scan outputs.
 
 \subsection{Axios}
 
@@ -44,7 +48,7 @@ Axios handles all HTTP communication between the React frontend and the Flask ba
 
 The backend API is developed using Python 3 and the Flask micro-framework. Flask-CORS allows cross-origin requests from the React frontend and browser extension.
 
-\begin{figure}[h]
+\begin{figure}[!htbp]
 \centering
 \includegraphics[width=0.8\textwidth]{images/chapter6/flask_routes.png}
 \caption{Flask app.py Route Definitions and ThreadPoolExecutor Block}
@@ -59,7 +63,7 @@ Python's \texttt{ThreadPoolExecutor} enables concurrent execution of network-dep
 
 Playwright is used to launch a headless Chromium browser to simulate real browsing behavior and capture redirects and external requests.
 
-\begin{figure}[h]
+\begin{figure}[!htbp]
 \centering
 \includegraphics[width=0.8\textwidth]{images/chapter6/playwright_logic.png}
 \caption{Playwright Launch and Network Interception Logic}
@@ -70,7 +74,7 @@ Playwright is used to launch a headless Chromium browser to simulate real browsi
 
 \begin{table}[h]
 \centering
-\begin{tabular}{ll}
+\begin{tabular}{|ll|}
 \toprule
 Library & Purpose \\
 \midrule
@@ -91,21 +95,25 @@ csv / zipfile & URLhaus feed extraction \\
 
 The browser extension is built using Manifest V3 and plain HTML, CSS, and JavaScript for the popup interface.
 
-\begin{figure}[h]
+\begin{figure}[!htbp]
 \centering
 \includegraphics[width=0.75\textwidth]{images/chapter6/extension_overview.png}
 \caption{Chrome Extension Popup — Overview Tab}
 \label{fig:extension_overview}
 \end{figure}
 
+The following figure shows the extension overview tab with compact risk information.
+
 The score arc is implemented using CSS transforms and transitions.
 
-\begin{figure}[h]
+\begin{figure}[!htbp]
 \centering
 \includegraphics[width=0.75\textwidth]{images/chapter6/extension_privacy_tab.png}
 \caption{Chrome Extension Popup — Behavior and Privacy Tabs}
 \label{fig:extension_privacy_tab}
 \end{figure}
+
+The following figure shows behavior and privacy tabs for deeper inspection inside the extension.
 
 \section{Threat Intelligence Tools}
 
@@ -113,7 +121,7 @@ The score arc is implemented using CSS transforms and transitions.
 
 URLhaus provides a community-maintained dataset of malicious URLs distributed as a ZIP-compressed CSV feed.
 
-\begin{figure}[h]
+\begin{figure}[!htbp]
 \centering
 \includegraphics[width=0.75\textwidth]{images/chapter6/urlhaus_updater_logic.png}
 \caption{URLhaus Feed Download and Auto-Refresh Logic}
@@ -140,7 +148,7 @@ ProblySUS currently runs locally with the Flask backend hosted at \texttt{http:/
 
 Several security safeguards are implemented since the system analyzes potentially malicious URLs.
 
-\begin{figure}[h]
+\begin{figure}[!htbp]
 \centering
 \includegraphics[width=0.8\textwidth]{images/chapter6/error_handler_validation.png}
 \caption{Global Error Handling and Input Validation Logic in app.py}
